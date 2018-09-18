@@ -20,8 +20,7 @@ from .common.prim import get_count
 from .common.prim import reset_count
 
 children = (   ( 'convexhull', None, 'Fecho Convexo' ),
-		( 'farthest',  None, 'Par Mais Distante' ),
-		( 'robotmv',  None, 'Movimento de robo' )
+		( 'farthest',  None, 'Par Mais Distante' )
 	)
 
 __all__ = [p[0] for p in children]
