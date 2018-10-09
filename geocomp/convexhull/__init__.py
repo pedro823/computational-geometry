@@ -13,7 +13,7 @@ Algoritmos disponiveis:
 - Um algoritmo otimo proposto por Chan
 - Um algoritmo otimo proposto por Bhattacharya e Sen
 
-algoritmo otimo = executa em tempo O(n lg(h)), n = numero de pontos, 
+algoritmo otimo = executa em tempo O(n lg(h)), n = numero de pontos,
                                                h = numero de arestas no fecho
 """
 from . import graham
@@ -27,7 +27,7 @@ from . import bhatta_sen
 
 # cada entrada deve ter:
 #  [ 'nome-do-modulo', 'nome-da-funcao', 'nome do algoritmo' ]
-children = ( 
+children = (
 	( 'graham', 'Graham', 'Graham' ),
 	( 'gift', 'Gift', 'Embrulho\nPara Presente' ),
 	( 'quickhull', 'Quickhull', 'Quickhull' ),
