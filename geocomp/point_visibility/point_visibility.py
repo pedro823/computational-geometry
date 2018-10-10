@@ -2,6 +2,7 @@ from geocomp.common.segment import Segment
 from geocomp.common.point import Point
 from util.type_checker import type_checked
 from geocomp.common.prim import dist2
+from itertools import izip, islice
 import math
 
 
@@ -31,8 +32,26 @@ def intersects(seg1: Segment, seg2: Segment) -> bool:
 
 
 @type_checked()
-def point_visibility(segment_list: list, origin_point: Point):
+def point_visibility(segment_list: list, origin_point: Point) -> list:
     event_points = [segment.init for segment in segment_list]
     event_points += [segment.to for segment in segment_list]
     event_points.sort(key=lambda point: distance_to_origin(origin_point, point))
     event_points.sort(key=lambda point: angle_from_origin(origin_point, point))
+
+def point_visibility_with_points(point_list: list) -> list:
+    ''' Before passing to the original point_visibility problem,
+        creates a problem using points drawn on the screen.
+    '''
+    if len(point_list) <= 2:
+        return []
+
+    if len(point_list) % 2 == 0:
+        # Even number of points => odd number on edges.
+        # adds last point again
+        point_list.append(point_list[-1])
+
+    origin_point = point_list[0]
+    segment_list = [Segment(x1, x2) for x1, x2
+                    in izip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
+
+    return point_visibility(segment_list, origin_point)
