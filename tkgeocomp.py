@@ -33,7 +33,7 @@ class App:
 		self.file_label.pack ()
 		self.file_sub_frame = Frame (self.file_frame)
 		self.file_sub_frame.pack (fill = BOTH)
-		self.selected_file.trace_variable ("w", 
+		self.selected_file.trace_variable ("w",
 				                   lambda x, y, z, self=self: self.open_file ())
 
 		filename = self.update_files (config.DATADIR)
@@ -42,13 +42,13 @@ class App:
 
 		self.main_frame = Frame (self.tk)
 		self.main_frame.pack (fill=BOTH, expand = 1)
-		self.main_frame.bind ('<Control-q>', 
+		self.main_frame.bind ('<Control-q>',
 				      lambda event, self=self: self.tk.quit ())
 
-		self.canvas = Canvas (self.main_frame, 
-				      width = config.WIDTH, 
-				      height = config.HEIGHT, 
-				      bg = 'black', 
+		self.canvas = Canvas (self.main_frame,
+				      width = config.WIDTH,
+				      height = config.HEIGHT,
+				      bg = 'black',
 				      takefocus=1)
 		self.canvas.pack (fill = BOTH, expand=1)
 
@@ -57,26 +57,26 @@ class App:
 		self.controls.pack (fill = BOTH, expand = 1)
 
 		self.step_by_step = IntVar ()
-		self.step_button = Checkbutton (self.controls, 
-						text = 'passo a passo', 
+		self.step_button = Checkbutton (self.controls,
+						text = 'passo a passo',
 						variable = self.step_by_step)
 
 		self.step_button.grid (row=0, column=0, sticky=W+E, padx=20)
 
-		self.print_canvas = Button (self.controls, 
-					    text = 'imprimir', 
+		self.print_canvas = Button (self.controls,
+					    text = 'imprimir',
 					    command = self.print_to_file)
 		self.print_canvas.grid (row=0, column = 1, sticky=W+E, padx=20)
 
 		self.show_var = IntVar ()
-		self.show_button = Checkbutton (self.controls, 
+		self.show_button = Checkbutton (self.controls,
 						text = 'esconder',
 						variable = self.show_var)
 		self.show_button.grid (row=0, column = 2, sticky=W+E, padx=20)
 
 
-		self.delay = Scale (self.main_frame, orient = HORIZONTAL, 
-				    from_ = 0, to = config.MAX_DELAY, 
+		self.delay = Scale (self.main_frame, orient = HORIZONTAL,
+				    from_ = 0, to = config.MAX_DELAY,
 				    resolution = 10)
 		self.delay.set (config.DELAY)
 		self.delay.pack (fill = X, side=BOTTOM)
@@ -152,7 +152,7 @@ class App:
 						            self.create_buttons (b)
 				b.problem = getattr (problem, a[0])
 				b.parent = problem
-				b.grid (row = row, column = 0, 
+				b.grid (row = row, column = 0,
 					columnspan = 2, sticky = W+E)
 			else:
 				alg = getattr (problem, a[0])
@@ -168,7 +168,7 @@ class App:
 				b.label = l
 
 			row = row + 1
-			if first: 
+			if first:
 				b.focus_set ()
 				first = 0
 				buttons.focus = b
@@ -178,7 +178,7 @@ class App:
 			b['command'] = lambda b=b, self=self: self.create_buttons (b)
 			b.problem = parent
 			b.parent = parent
-			b.grid (row = row, column = 0, columnspan = 1, 
+			b.grid (row = row, column = 0, columnspan = 1,
 				sticky = W+E)
 		else:
 			b = Button (buttons, text = 'Sair')
@@ -194,7 +194,7 @@ class App:
 	def open_file (self, event=None):
 		"abre um arquivo de entrada"
 		#if self.in_algorithm: return
-		selection = os.path.join (self.filelist.directory, 
+		selection = os.path.join (self.filelist.directory,
 					  self.selected_file.get ())
 		if os.path.isdir (selection):
 			self.update_files (selection)
@@ -241,14 +241,14 @@ class App:
 			self.step_button['state'] = NORMAL
 			self.print_canvas['state'] = NORMAL
 		self.show_button['state'] = NORMAL
-	                
+
 	def reset_labels (self):
 		"Joga fora o conteudo de todos os labels"
 		for l in self.labels:
 			l['text'] = '------'
 
 		self.bottom_label['text'] = '----------'
-	        
+
 	def print_to_file (self):
 		"Imprime self.canvas para um arquivo .eps"
 		if self.current_algorithm != None:
@@ -260,8 +260,8 @@ class App:
 				  repr(self.file_cont) + '.eps'
 			self.canvas.postscript (file=epsfile)
 			self.file_cont = self.file_cont + 1
-		        
-	
+
+
 	def run_algorithm (self, alg, widget, alg_name):
 		"""roda o algoritmo alg"""
 		self.file_cont = 0
@@ -283,7 +283,7 @@ class App:
 
 		self.tk.unbind ('<space>')
 		self.enable ()
-		
+
 
 app = App ()
 
