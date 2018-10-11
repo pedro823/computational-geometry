@@ -1,15 +1,3 @@
-from .segment import Segment
-from .point import Point
-from .prim import left
-
-class SegmentReference:
-    def __init__(self, segment: Segment, point: Point):
-        self.segment = segment
-        self.point = point
-
-    def __lt__(self, other):
-        return other.segment.has_left(self.point)
-
 class Node:
     RED = True
     BLACK = False
@@ -295,29 +283,3 @@ class RedBlackTree:
                     self.__right_rotate(x.parent)
                     x = self.root
         x.color = Node.BLACK
-
-def test(_):
-    rbt = RedBlackTree()
-    s1 = Segment(Point(2, 1), Point(1, 1))
-    s2 = Segment(Point(2, 2), Point(1, 3))
-    s3 = Segment(Point(2, 3), Point(1, 2))
-    s4 = Segment(Point(2, 3), Point(1, 4))
-    s5 = Segment(Point(2, 5), Point(1, 5))
-    sr1 = SegmentReference(s1, s1.init)
-    sr2 = SegmentReference(s2, s2.init)
-    sr3 = SegmentReference(s3, s3.init)
-    sr4 = SegmentReference(s4, s4.init)
-    sr5 = SegmentReference(s5, s5.init)
-    rbt.insert(1, sr1)
-    rbt.insert(2, sr2)
-    rbt.insert(3, sr3)
-    rbt.insert(4, sr4)
-    rbt.insert(5, sr5)
-    print(rbt)
-    print(rbt._get_seq())
-    rbt.delete(4)
-    rbt.delete(3)
-    rbt.insert(4, sr4)
-    rbt.insert(3, sr3)
-    print(rbt)
-    print(rbt._get_seq())

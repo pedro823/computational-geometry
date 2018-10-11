@@ -5,6 +5,13 @@ from geocomp.common.prim import dist2
 from itertools import izip, islice
 import math
 
+class SegmentReference:
+    def __init__(self, segment: Segment, point: Point):
+        self.segment = segment
+        self.point = point
+
+    def __lt__(self, other):
+        return other.segment.has_left(self.point)
 
 @type_checked()
 def angle_from_origin(origin_point: Point, test_point: Point) -> float:
