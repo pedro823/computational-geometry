@@ -3,30 +3,24 @@ from .point import Point
 from .prim import left
 
 class SegmentReference:
-    def __init__(self, id: int, segment: Segment, point: Point):
+    def __init__(self, segment: Segment, point: Point):
         self.segment = segment
         self.point = point
-        self.id = id
 
     def __lt__(self, other):
         return other.segment.has_left(self.point)
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
 class Node:
     RED = True
     BLACK = False
 
-    def __init__(self, key, color = RED):
+    def __init__(self, id, key, color = RED):
         if not type(color) == bool:
             raise TypeError("Bad value for color parameter, expected True/False but given %s" % color)
         self.color = color
         self.key = key
         self.left = self.right = self.parent = NilNode.instance()
+        self.id = id
 
     def __str__(self, level = 0, indent = "   "):
         s = level * indent + str(self.key)
@@ -67,14 +61,32 @@ class RedBlackTree:
     def __init__(self):
         self.root = NilNode.instance()
         self.size = 0
+        self.control = {}
 
-    def __str__(self):
-        return ("(root.size = %d)\n" % self.size)    + str(self.root)
+    def __str__helper(self, node, level = 0, indent = "   "):
+        s = level * indent + str(node.id)
+        if node.left:
+            s += "\n" + self.__str__helper(node.left, level + 1, indent)
+        if node.right:
+            s += "\n" + self.__str__helper(node.right, level + 1, indent)
+        return s
 
-    def add(self, key):
-        self.insert(Node(key))
+    def __str__(self, indent="  "):
+        return ("(root.size = %d)\n" % self.size) + \
+                self.__str__helper(self.root, indent=indent)
 
-    def insert(self, x):
+    def _get_seq(self):
+        mn = self.minimum()
+        s = str(mn.id)
+        next = self.successor(mn)
+        while next:
+            s += " " + str(next.id)
+            next = self.successor(next)
+        return s
+
+    def insert(self, id, key):
+        x = Node(id, key)
+        self.control[x.id] = x
         self.__insert_helper(x)
 
         x.color = Node.RED
@@ -109,7 +121,8 @@ class RedBlackTree:
                     self.__left_rotate(x.parent.parent)
         self.root.color = Node.BLACK
 
-    def delete(self, z):
+    def delete(self, id):
+        z = self.control[id]
         if not z.left or not z.right:
             y = z
         else:
@@ -128,7 +141,10 @@ class RedBlackTree:
             else:
                 y.parent.right = x
 
-        if y != z: z.key = y.key
+        if y != z:
+            z.key = y.key
+            z.id = y.id
+            self.control[z.id] = z
 
         if y.color == Node.BLACK:
             self.__delete_fixup(x)
@@ -166,14 +182,15 @@ class RedBlackTree:
             y = y.parent
         return y
 
-    def search(self, key, x = None):
-        if x is None: x = self.root
-        while x and x.key != key:
-            if key < x.key:
-                x = x.left
-            else:
-                x = x.right
-        return x
+    def search(self, id):
+        # if x is None: x = self.root
+        # while x and x.key != key:
+        #     if key < x.key:
+        #         x = x.left
+        #     else:
+        #         x = x.right
+        # print(x, "<<<<")
+        return self.control[id]
 
     def is_empty(self):
         return bool(self.root)
@@ -278,3 +295,29 @@ class RedBlackTree:
                     self.__right_rotate(x.parent)
                     x = self.root
         x.color = Node.BLACK
+
+def test(_):
+    rbt = RedBlackTree()
+    s1 = Segment(Point(2, 1), Point(1, 1))
+    s2 = Segment(Point(2, 2), Point(1, 3))
+    s3 = Segment(Point(2, 3), Point(1, 2))
+    s4 = Segment(Point(2, 3), Point(1, 4))
+    s5 = Segment(Point(2, 5), Point(1, 5))
+    sr1 = SegmentReference(s1, s1.init)
+    sr2 = SegmentReference(s2, s2.init)
+    sr3 = SegmentReference(s3, s3.init)
+    sr4 = SegmentReference(s4, s4.init)
+    sr5 = SegmentReference(s5, s5.init)
+    rbt.insert(1, sr1)
+    rbt.insert(2, sr2)
+    rbt.insert(3, sr3)
+    rbt.insert(4, sr4)
+    rbt.insert(5, sr5)
+    print(rbt)
+    print(rbt._get_seq())
+    rbt.delete(4)
+    rbt.delete(3)
+    rbt.insert(4, sr4)
+    rbt.insert(3, sr3)
+    print(rbt)
+    print(rbt._get_seq())
