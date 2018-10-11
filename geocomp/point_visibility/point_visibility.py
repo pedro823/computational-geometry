@@ -1,6 +1,6 @@
 from geocomp.common.segment import Segment
 from geocomp.common.point import Point
-from util.type_checker import type_checked
+from utils.type_checker import type_checked
 from geocomp.common.prim import dist2
 from itertools import izip, islice
 import math
