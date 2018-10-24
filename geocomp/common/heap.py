@@ -19,7 +19,6 @@ class Heap:
         '''
         self.heap = []
         self.key_function = key_function
-        self.length = 0
         self.is_max_heap = is_max_heap
 
     def insert(self, element):
@@ -35,6 +34,9 @@ class Heap:
         self.heap[0] = self.heap.pop()
         self.__sink(0)
         return top_element
+
+    def __len__(self):
+        return len(self.heap)
 
     def __promote(self, index):
         element = self.heap[index]
