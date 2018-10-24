@@ -1,8 +1,8 @@
 from geocomp.common.segment import Segment
 from geocomp.common.point import Point
-from util.type_checker import type_checked
+from utils.type_checker import type_checked
 from geocomp.common.prim import dist2
-from itertools import izip, islice
+from itertools import islice
 import math
 
 class SegmentReference:
@@ -59,6 +59,6 @@ def point_visibility_with_points(point_list: list) -> list:
 
     origin_point = point_list[0]
     segment_list = [Segment(x1, x2) for x1, x2
-                    in izip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
+                    in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
 
     return point_visibility(segment_list, origin_point)
