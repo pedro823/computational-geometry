@@ -33,6 +33,9 @@ class Segment:
         if id is None: id = self.lid
         control.plot_delete (id)
 
+    def has_left(self, point):
+        return left(self.init, self.to, point)
+
     def colinear_with(self, point):
         ''' returns if point is colinear with the segment. '''
         return area2(self.init, self.to, point) == 0
