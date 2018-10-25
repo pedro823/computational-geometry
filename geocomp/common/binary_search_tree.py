@@ -45,7 +45,7 @@ class NilNode(Node):
     def __bool__(self):
         return False
 
-class RedBlackTree:
+class BinarySearchTree:
     def __init__(self):
         self.root = NilNode.instance()
         self.size = 0
