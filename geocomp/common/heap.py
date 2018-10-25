@@ -3,14 +3,14 @@ identity = lambda x: x
 class Heap:
 
     @classmethod
-    def from_list(cls, element_list: list, is_max_heap: bool, key_function=identity):
+    def from_list(cls, element_list: list, is_max_heap: bool = False, key_function=identity):
         heap = cls(is_max_heap, key_function)
         for element in element_list:
             heap.insert(element)
         return heap
 
 
-    def __init__(self, is_max_heap: bool, key_function=identity):
+    def __init__(self, is_max_heap: bool = False, key_function=identity):
         ''' Initializes an empty heap.
             :param is_max_heap: True if heap should be a max-heap.
                                 False otherwise.
@@ -31,13 +31,19 @@ class Heap:
 
     def pop_element(self):
         top_element = self.heap[0]
-        self.heap[0] = self.heap.pop()
-        self.__sink(0)
+        if len(self.heap) > 1:
+            self.heap[0] = self.heap.pop()
+            self.__sink(0)
+        else:
+            self.heap.pop()
         return top_element
+    
+    __len__ = lambda self: len(self.heap)
 
-    def __len__(self):
-        return len(self.heap)
-
+    __str__ = lambda self: str(self.heap)
+    
+    __bool__ = __nonzero__ = lambda self: len(self) > 0
+    
     def __promote(self, index):
         element = self.heap[index]
         while not self.__is_root(index):
@@ -60,7 +66,7 @@ class Heap:
                     child_idx = self.__right(index)
                     child = right_child
 
-            if self.__is_less_or_eq(child, self.heap[index]) ^ self.is_max_heap:
+            if self.__is_less_or_eq(self.heap[index], child) ^ self.is_max_heap:
                 break
             # swap
             temp = self.heap[index]
@@ -71,19 +77,32 @@ class Heap:
     def __is_less_or_eq(self, element1, element2):
         key_elem1 = self.key_function(element1)
         key_elem2 = self.key_function(element2)
-        return key_elem1 < key_elem2
+        return key_elem1 <= key_elem2
 
-    def __is_root(self, index):
+    @staticmethod
+    def __is_root(index):
         return index == 0
 
-    def __parent(self, index):
+    @staticmethod
+    def __parent(index):
         return (index - 1) // 2
 
-    def __left(self, index):
+    @staticmethod
+    def __left(index):
         return index * 2 + 1
 
-    def __right(self, index):
+    @staticmethod
+    def __right(index):
         return index * 2 + 2
 
-    def __sibling(self, index):
+    @staticmethod
+    def __sibling(index):
         return index + 1 if index & 1 else index - 1
+
+# Unit testing
+if __name__ == '__main__':
+    heap = Heap.from_list([5, 9, 10, 2, 4, 12, 1, 3, 0, -1, 56])
+    for i in range(10):
+        heap.insert(10 + i)
+    while heap:
+        print(heap.pop_element())
