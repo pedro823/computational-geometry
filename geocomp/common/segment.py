@@ -42,7 +42,7 @@ class Segment:
 
     def has_inside(self, point):
         ''' returns if point is inside the segment. '''
-        if not self.colinear(point):
+        if not self.colinear_with(point):
             return False
         if self.init.x != self.to.x:
             return self.init.x <= point.x <= self.to.x \

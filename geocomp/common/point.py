@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from . import control
+from .vector import Vector
+from .prim import dist2
 from geocomp import config
 
 class Point:
@@ -43,6 +45,20 @@ class Point:
         "Apaga o 'destaque' do ponto"
         if id == None: id = self.hi
         control.plot_delete (id)
+
+    def __add__(self, other: Vector):
+        if not isinstance(other, Vector):
+            raise ValueError('Cannot add point and {}'.format(type(other)))
+        if other.dimension != 2:
+            raise ValueError('Cannot add 2-d point with non 2-d vector')
+        return Point(self.x + other[0], self.y + other[1])
+
+    def distance_to(self, other):
+        return dist2(self, other) ** 0.5
+    # def __sub__(self, other):
+    #     if not isinstance(other, Point):
+    #         raise ValueError('Cannot subtract point and ' + str(type(other)))
+    #     return Point(self.x - other.x, self.y - other.y)
 
     def lineto (self, p, color=config.COLOR_LINE):
         "Desenha uma linha ate um ponto p na cor especificada"
