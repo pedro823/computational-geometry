@@ -44,10 +44,23 @@ class Point:
         if id == None: id = self.hi
         control.plot_delete (id)
 
-    def __sub__(self, other):
+    def __add__(self, other: Vector):
+        if not isinstance(other, Vector):
+            raise ValueError('Cannot add point and {}'.format(type(other)))
+        if other.dimension != 2:
+            raise ValueError('Cannot add 2-d point with non 2-d vector')
+        return Point(self.x + other[0], self.y + other[1])
+
+    def distance_to(self, other: Point):
         if not isinstance(other, Point):
-            raise ValueError('Cannot subtract point and ' + str(type(other)))
-        return Point(self.x - other.x, self.y - other.y)
+            raise ValueError('distance_to needs Point, got {}'.format(type(other)))
+
+        return ((other.x-self.x)**2) + (other.y-self.y)**2)**.5
+
+    # def __sub__(self, other):
+    #     if not isinstance(other, Point):
+    #         raise ValueError('Cannot subtract point and ' + str(type(other)))
+    #     return Point(self.x - other.x, self.y - other.y)
 
     def lineto (self, p, color=config.COLOR_LINE):
         "Desenha uma linha ate um ponto p na cor especificada"
