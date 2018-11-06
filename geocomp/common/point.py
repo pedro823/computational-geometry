@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from . import control
+from .vector import Vector
+from .prim import dist2
 from geocomp import config
 
 class Point:
@@ -51,12 +53,8 @@ class Point:
             raise ValueError('Cannot add 2-d point with non 2-d vector')
         return Point(self.x + other[0], self.y + other[1])
 
-    def distance_to(self, other: Point):
-        if not isinstance(other, Point):
-            raise ValueError('distance_to needs Point, got {}'.format(type(other)))
-
-        return ((other.x-self.x)**2) + (other.y-self.y)**2)**.5
-
+    def distance_to(self, other):
+        return dist2(self, other) ** 0.5
     # def __sub__(self, other):
     #     if not isinstance(other, Point):
     #         raise ValueError('Cannot subtract point and ' + str(type(other)))

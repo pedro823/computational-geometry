@@ -2,6 +2,8 @@ import math
 from itertools import islice
 
 from geocomp.common.segment import Segment
+from geocomp.common.vector import Vector
+from geocomp.common.ray import Ray
 from geocomp.common.point import Point
 from geocomp.common.prim import dist2
 from geocomp.common.binary_search_tree import BinarySearchTree
@@ -42,11 +44,11 @@ def intersects(seg1: Segment, seg2: Segment) -> bool:
 
 @type_checked()
 def intersects_with_sweep_line(seg: Segment, origin_point: Point) -> bool:
-    starting_sweep_line = Segment(origin_point, Point(float('+inf'), origin_point.y))
+    starting_sweep_line = Ray(origin_point, Vector([1, 0]))
 
-    return seg.intersects(starting_sweep_line)
+    return starting_sweep_line.intersects(seg)
 
-
+def add_to_sweep_line(*args): pass
 
 @type_checked()
 def point_visibility(segment_list: list, origin_point: Point) -> list:
@@ -59,18 +61,23 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     event_points.sort(key=lambda point: distance_to_origin(origin_point, point))
     event_points.sort(key=lambda point: angle_from_origin(origin_point, point))
 
-    event_heap = Heap.from_list(event_points)
+    # Unfortunately, python has no currying
+    event_heap = Heap.from_list(event_points, 
+                                key_function = lambda p: distance_to_origin(origin_point, p))
+
     # STEP 2: Initialize sweep line
     sweep_line = BinarySearchTree()
 
     # STEP 2.1: Check if there are no points inside the sweep line already. O(n)
-    # for segment in segment_list:
-    #     if intersects_with_sweep_line(segment, origin_point):
-    #         TODO add segment to the sweep line
+    for segment in segment_list:
+        segment.hilight()
+        if intersects_with_sweep_line(segment, origin_point):
+            # TODO add segment to the sweep line
+            add_to_sweep_line(sweep_line, segment)
 
     # STEP 3: Sweep line
 
-
+    return []
 
 def point_visibility_with_points(point_list: list) -> list:
     ''' Before passing to the original point_visibility problem,
@@ -89,7 +96,7 @@ def point_visibility_with_points(point_list: list) -> list:
                     in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
     
     print(segment_list, origin_point)
-    for segment in segment_list:
-        segment.plot()
-    return []
+    # for segment in segment_list:
+    #     segment.plot()
+
     return point_visibility(segment_list, origin_point)

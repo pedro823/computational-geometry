@@ -1,6 +1,6 @@
-from point import Point
-from segment import Segment
-from vector import Vector
+from .point import Point
+from .segment import Segment
+from .vector import Vector
 
 class Ray:
     def __init__(self, origin: Point, direction: Vector):
