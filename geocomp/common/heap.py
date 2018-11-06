@@ -41,7 +41,7 @@ class Heap:
     __len__ = lambda self: len(self.heap)
 
     __str__ = lambda self: 'Heap: ' + str(self.heap)
-    
+
     __bool__ = __nonzero__ = lambda self: len(self) > 0
     
     def __promote(self, index):
