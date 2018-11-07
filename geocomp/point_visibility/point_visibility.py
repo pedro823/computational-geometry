@@ -61,9 +61,18 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     event_points.sort(key=lambda point: distance_to_origin(origin_point, point))
     event_points.sort(key=lambda point: angle_from_origin(origin_point, point))
 
+    @type_checked()
+    def comparison_function(p1: Point, p2: Point) -> float:
+        angle1, angle2 = angle_from_origin(origin_point, p1), angle_from_origin(origin_point, p2)
+        if abs(angle1 - angle2) < 1e-7:
+            return round(
+                        distance_to_origin(origin_point, p1) 
+                        - distance_to_origin(origin_point, p2), 7)
+        return angle1 - angle2
+
     # Unfortunately, python has no currying
     event_heap = Heap.from_list(event_points, 
-                                key_function = lambda p: distance_to_origin(origin_point, p))
+                                cmp_function=comparison_function)
 
     # STEP 2: Initialize sweep line
     sweep_line = BinarySearchTree()
