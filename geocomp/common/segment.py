@@ -20,7 +20,7 @@ class Segment:
         "desenha o segmento de reta com destaque na tela"
         self.lid = self.init.lineto (self.to, color_line)
         self.pid0 = self.init.hilight (color_point)
-        self.pid1 = self.to.hilight (color_point)
+        self.pid1 = self.to.hilight ('blue')
         return self.lid
 
     def plot (self, cor=config.COLOR_SEGMENT):
