@@ -1,28 +1,27 @@
-identity = lambda x: x
+subtraction = lambda a, b: a - b
 
 class Heap:
 
     @classmethod
-    def from_list(cls, element_list: list, is_max_heap: bool = False, key_function=identity):
-        heap = cls(is_max_heap, key_function)
+    def from_list(cls, element_list: list, is_max_heap: bool = False, cmp_function=subtraction):
+        heap = cls(is_max_heap, cmp_function)
         for element in element_list:
             heap.insert(element)
         return heap
 
 
-    def __init__(self, is_max_heap: bool = False, key_function=identity):
+    def __init__(self, is_max_heap: bool = False, cmp_function=subtraction):
         ''' Initializes an empty heap.
             :param is_max_heap: True if heap should be a max-heap.
                                 False otherwise.
-            :param key_function: A function that extracts the key
+            :param cmp_function: A function that compares two values.
             from the element. The heap will be indexed by the key.
         '''
         self.heap = []
-        self.key_function = key_function
+        self.cmp_function = cmp_function
         self.is_max_heap = is_max_heap
 
     def insert(self, element):
-        key = self.key_function(element)
         self.heap.append(element)
         self.__promote(len(self.heap) - 1)
 
@@ -75,9 +74,7 @@ class Heap:
             index = child_idx
 
     def __is_less_or_eq(self, element1, element2):
-        key_elem1 = self.key_function(element1)
-        key_elem2 = self.key_function(element2)
-        return key_elem1 <= key_elem2
+        return self.cmp_function(element1, element2) <= 0
 
     @staticmethod
     def __is_root(index):
