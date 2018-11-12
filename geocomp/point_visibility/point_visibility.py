@@ -1,5 +1,5 @@
 import math
-from dataclasses import dataclass
+
 from itertools import islice
 from enum import Enum
 
@@ -25,11 +25,11 @@ class EventType(Enum):
     DELETE = 1
     SWAP = 2
 
-@dataclass
 class Event:
-    segment_ids: list
-    point: Point
-    type: EventType
+    def __init__(self, segment_ids: list, point: Point, type: EventType):
+        self.segment_ids = segment_ids
+        self.point = point
+        self.type = type
 
 class SweepLine:
     def __init__(self, origin_point: Point):
@@ -73,15 +73,22 @@ def add_to_sweep_line(sweep_line: SweepLine, id: int, segment: Segment):
 @type_checked()
 def point_visibility(segment_list: list, origin_point: Point) -> list:
 
-    visible_segments = []
+    visible_segments = set()
 
+    # HACK trocar a ordenação: pontos de inicio, quando empatam, vao crescente por distancia,
+    # já os finais, vao decrescente por distancia
     @type_checked()
     def comparison_function(p1: Event, p2: Event) -> float:
         angle1, angle2 = angle_from_origin(origin_point, p1.point), angle_from_origin(origin_point, p2.point)
         if abs(angle1 - angle2) < 1e-7:
+            multiplier = float(1 if p1.type == EventType.INSERT else -1)
+
+            if p1.type != p2.type:
+                return -multiplier
+
             return round(
                         distance_to_origin(origin_point, p1) 
-                        - distance_to_origin(origin_point, p2), 7)
+                        - distance_to_origin(origin_point, p2), 7) * multiplier
         return angle1 - angle2
 
     # STEP 1: Sort event points
@@ -95,7 +102,7 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
 
         event_points.append(event_insert)
         event_points.append(event_delete)
-
+  
     event_heap = Heap.from_list(event_points, 
                                 cmp_function=comparison_function)
 
@@ -108,12 +115,16 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
         if intersects_with_sweep_line(sweep_line, segment):
             add_to_sweep_line(sweep_line, i, segment)
 
-    # print(sweep_line.bst)
-    # while event_heap:
-    #     el = event_heap.pop_element()
-    #     print(el, angle_from_origin(origin_point, el.point))
+    print(sweep_line.bst)
 
     # STEP 3: Sweep line
+    while event_heap:
+        # 3.1: pegar o minimo e colocar no set
+        el = event_heap.pop_element()
+        print(el, angle_from_origin(origin_point, el.point))
+        # 3.2: Inserir ou remover da ABBB os itens
+        # Não precisa checar intersecção
+        # :)
 
     return []
 
