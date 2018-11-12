@@ -75,14 +75,29 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
 
     visible_segments = []
 
-    # STEP 1: Sort event points
-    event_points = [Event([i], segment.init, EventType.INSERT) for i, segment in enumerate(segment_list)]
-    event_points += [Event([i], segment.to, EventType.DELETE) for i, segment in enumerate(segment_list)]
-    event_points.sort(key=lambda e: distance_to_origin(origin_point, e.point))
+    @type_checked()
+    def comparison_function(p1: Event, p2: Event) -> float:
+        angle1, angle2 = angle_from_origin(origin_point, p1.point), angle_from_origin(origin_point, p2.point)
+        if abs(angle1 - angle2) < 1e-7:
+            return round(
+                        distance_to_origin(origin_point, p1) 
+                        - distance_to_origin(origin_point, p2), 7)
+        return angle1 - angle2
 
-    # Unfortunately, python has no currying
-    event_heap = Heap.from_list(event_points,
-                                key_function = lambda e: angle_from_origin(origin_point, e.point))
+    # STEP 1: Sort event points
+    event_points = []
+    for idx, segment in enumerate(segment_list):
+        event_insert = Event([idx], segment.init, EventType.INSERT)
+        event_delete = Event([idx], segment.to, EventType.DELETE)
+
+        if comparison_function(event_insert, event_delete) > 0:
+            event_insert.point, event_delete.point = event_delete.point, event_insert.point
+
+        event_points.append(event_insert)
+        event_points.append(event_delete)
+
+    event_heap = Heap.from_list(event_points, 
+                                cmp_function=comparison_function)
 
     # STEP 2: Initialize sweep line
     sweep_line = SweepLine(origin_point)
@@ -115,18 +130,19 @@ def point_visibility_with_points(point_list: list) -> list:
         point_list.append(point_list[-1])
 
     origin_point = point_list[0]
-    segment_list = []
-    for x1, x2 in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2)):
-        a1 = angle_from_origin(origin_point, x1)
-        a2 = angle_from_origin(origin_point, x2)
-        d1 = distance_to_origin(origin_point, x1)
-        d2 = distance_to_origin(origin_point, x2)
-        if (a1 > a2 and a1 - a2 <= math.pi) or \
-           (a1 < a2 and a2 - a1 > math.pi) or \
-           (a1 == a2 and d1 > d2):
-            segment_list.append(Segment(x2, x1))
-        else:
-            segment_list.append(Segment(x1, x2))
+    segment_list = [Segment(x1, x2) for x1, x2
+                    in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
+    # for x1, x2 in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2)):
+    #     a1 = angle_from_origin(origin_point, x1)
+    #     a2 = angle_from_origin(origin_point, x2)
+    #     d1 = distance_to_origin(origin_point, x1)
+    #     d2 = distance_to_origin(origin_point, x2)
+    #     if (a1 > a2 and a1 - a2 <= math.pi) or \
+    #        (a1 < a2 and a2 - a1 > math.pi) or \
+    #        (a1 == a2 and d1 > d2):
+    #         segment_list.append(Segment(x2, x1))
+    #     else:
+    #         segment_list.append(Segment(x1, x2))
 
     print(segment_list, origin_point)
     # for segment in segment_list:
