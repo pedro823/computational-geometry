@@ -14,7 +14,7 @@ num_area2 = 0
 num_dist = 0
 
 def area2 (a, b, c):
-	"Retorna duas vezes a rea do tringulo determinado por a, b, c"
+	"Retorna duas vezes area do tringulo determinado por a, b, c"
 	global num_area2
 	num_area2 = num_area2 + 1
 	return (b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)
