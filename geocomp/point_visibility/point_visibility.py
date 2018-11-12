@@ -26,8 +26,8 @@ class EventType(Enum):
     SWAP = 2
 
 class Event:
-    def __init__(self, segment_ids: list, point: Point, type: EventType):
-        self.segment_ids = segment_ids
+    def __init__(self, segment_id: int, point: Point, type: EventType):
+        self.segment_id = segment_id
         self.point = point
         self.type = type
 
@@ -72,6 +72,7 @@ def add_to_sweep_line(sweep_line: SweepLine, id: int, segment: Segment):
 
 @type_checked()
 def point_visibility(segment_list: list, origin_point: Point) -> list:
+    origin_point.hilight('yellow')
 
     visible_segments = set()
 
@@ -94,10 +95,11 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     # STEP 1: Sort event points
     event_points = []
     for idx, segment in enumerate(segment_list):
-        event_insert = Event([idx], segment.init, EventType.INSERT)
-        event_delete = Event([idx], segment.to, EventType.DELETE)
+        event_insert = Event(idx, segment.init, EventType.INSERT)
+        event_delete = Event(idx, segment.to, EventType.DELETE)
 
         if comparison_function(event_insert, event_delete) > 0:
+            segment.to, segment.init = segment.init, segment.to
             event_insert.point, event_delete.point = event_delete.point, event_insert.point
 
         event_points.append(event_insert)
@@ -112,18 +114,44 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     # STEP 2.1: Check if there are no points inside the sweep line already. O(n)
     for i, segment in enumerate(segment_list):
         segment.hilight()
-        if intersects_with_sweep_line(sweep_line, segment):
+        if intersects_with_sweep_line(sweep_line, segment) \
+           and not sweep_line.ray.has_inside(segment.init):
             add_to_sweep_line(sweep_line, i, segment)
+
+    print(sweep_line.bst)
 
     # STEP 3: Sweep line
     while event_heap:
+        event = event_heap.pop_element()
         # 3.1: pegar o minimo e colocar no set
-        el = event_heap.pop_element()
+        print(event)
+        print(event.type)
+        minimum = sweep_line.bst.minimum()
+        if minimum:
+            visible_segments.add(minimum.key.segment)
+
         # 3.2: Inserir ou remover da ABBB os itens
         # Não precisa checar intersecção
         # :)
+        if event.type == EventType.INSERT:
 
-    return []
+            segment = segment_list[event.segment_id]
+            sweep_line.bst.insert(event.segment_id, 
+                                  SegmentReference(segment, event.point))
+        elif event.type == EventType.DELETE:
+            sweep_line.bst.delete(event.segment_id)
+    
+    minimum = sweep_line.bst.minimum()
+    if minimum:
+        visible_segments.add(minimum.key.segment)
+
+
+    print(visible_segments)
+    print(len(visible_segments))
+    # for segment in visible_segments:
+    #     segment.unhilight()
+
+    return list(visible_segments)
 
 def point_visibility_with_points(point_list: list) -> list:
     ''' Before passing to the original point_visibility problem,
@@ -140,21 +168,5 @@ def point_visibility_with_points(point_list: list) -> list:
     origin_point = point_list[0]
     segment_list = [Segment(x1, x2) for x1, x2
                     in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
-    # for x1, x2 in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2)):
-    #     a1 = angle_from_origin(origin_point, x1)
-    #     a2 = angle_from_origin(origin_point, x2)
-    #     d1 = distance_to_origin(origin_point, x1)
-    #     d2 = distance_to_origin(origin_point, x2)
-    #     if (a1 > a2 and a1 - a2 <= math.pi) or \
-    #        (a1 < a2 and a2 - a1 > math.pi) or \
-    #        (a1 == a2 and d1 > d2):
-    #         segment_list.append(Segment(x2, x1))
-    #     else:
-    #         segment_list.append(Segment(x1, x2))
-
-    print(segment_list, origin_point)
-    # for segment in segment_list:
-    #     segment.plot()
-    origin_point.hilight('yellow')
 
     return point_visibility(segment_list, origin_point)

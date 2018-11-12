@@ -13,3 +13,9 @@ class Ray:
         end_point = self.origin + expanded_vector
         segment = Segment(self.origin, end_point)
         return segment.intersects(other)
+
+    def has_inside(self, other: Point):
+        distance = other.distance_to(self.origin)
+        expanded_vector = self.direction * distance
+        end_point = self.origin + expanded_vector
+        return end_point.approx_equals(other)
