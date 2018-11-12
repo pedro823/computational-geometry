@@ -12,5 +12,4 @@ class Ray:
         expanded_vector = self.direction * max_distance
         end_point = self.origin + expanded_vector
         segment = Segment(self.origin, end_point)
-        print(f'segment={segment}, other={other}, intersect={segment.intersects(other)}')
         return segment.intersects(other)

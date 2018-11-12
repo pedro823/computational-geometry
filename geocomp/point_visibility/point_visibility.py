@@ -119,7 +119,6 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     while event_heap:
         # 3.1: pegar o minimo e colocar no set
         el = event_heap.pop_element()
-        print(el, angle_from_origin(origin_point, el.point))
         # 3.2: Inserir ou remover da ABBB os itens
         # Não precisa checar intersecção
         # :)
