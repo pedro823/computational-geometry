@@ -73,8 +73,22 @@ def plot_disc (x, y, color, r):
 	update ()
 	return plot_id
 
+def plot_segment (x0, y0, x1, y1, color=config.COLOR_LINE, linewidth = config.LINEWIDTH):
+	"""desenha um segmento que vai de (x0,y0) ate (x1,y1) de cor color"""
+	if skip: return 0
+	plot_id = gui.plot_segment (x0, y0, x1, y1, color, linewidth)
+	update ()
+	return plot_id
+
+def plot_ray (x0, y0, x1, y1, color=config.COLOR_LINE, linewidth = config.LINEWIDTH):
+	"""desenha uma semi-reta que parte de (x0,y0) e passa por (x1,y1) de cor color"""
+	if skip: return 0
+	plot_id = gui.plot_ray (x0, y0, x1, y1, color, linewidth)
+	update ()
+	return plot_id
+
 def plot_line (x0, y0, x1, y1, color=config.COLOR_LINE, linewidth = config.LINEWIDTH):
-	"""desenha uma linha que vai de (x0,y0) ate (x1,y1) de cor color"""
+	"""desenha uma reta que passa por (x0,y0) e (x1,y1) de cor color"""
 	if skip: return 0
 	plot_id = gui.plot_line (x0, y0, x1, y1, color, linewidth)
 	update ()

@@ -26,7 +26,7 @@ class Point:
 		control.plot_delete (id)
 	
 	def lineto (self, p, color='red'):
-		self.lineto_id[p] = control.plot_line (self.x, self.y, p.x, p.y, color)
+		self.lineto_id[p] = control.plot_segment (self.x, self.y, p.x, p.y, color)
 		return self.lineto_id[p]
 	
 	def remove_lineto (self, p, id = None):

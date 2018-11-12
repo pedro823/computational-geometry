@@ -53,7 +53,7 @@ def plot_disc (x, y, color, r):
 	widget.show ()
 	return None
 
-def plot_line (x0, y0, x1, y1, color, linewidth):
+def plot_segment (x0, y0, x1, y1, color, linewidth):
 	widget = canvas.root().add ('GnomeCanvasLine', points=(canvas.r2cx(x0), canvas.r2cy(y0), 
 							canvas.r2cx(x1), canvas.r2cy(y1)),
 					   fill_color=color, width_pixels=linewidth)

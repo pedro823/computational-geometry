@@ -16,7 +16,7 @@ def sleep ():
 def plot_disc (x, y, color, r):
 	pass
 
-def plot_line (x0, y0, x1, y1, color, linewidth):
+def plot_segment (x0, y0, x1, y1, color, linewidth):
 	pass
 
 def plot_vert_line (x, color, linewidth):

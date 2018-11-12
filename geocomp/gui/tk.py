@@ -26,17 +26,115 @@ def sleep ():
 		master.tk.after (master.delay.get (), master.tk.quit)
 		master.tk.mainloop ()
 
-
 def plot_disc (x, y, color, r):
 	plot_id = canvas.create_oval (canvas.r2cx(x)-r, canvas.r2cy(y)-r, 
 					canvas.r2cx(x)+r, canvas.r2cy(y)+r, fill=color)
 	return plot_id
 
-def plot_line (x0, y0, x1, y1, color, linewidth):
+def plot_segment (x0, y0, x1, y1, color, linewidth):
 	lineto_id = canvas.create_line (canvas.r2cx(x0), canvas.r2cy(y0), 
 					   canvas.r2cx(x1), canvas.r2cy(y1), 
 					   fill=color, width=linewidth)
 	return lineto_id
+
+def find_intersection_points(x0, y0, x1, y1):
+	"""retorna os dois pontos que a reta passando pelos pontos dos argumentos 
+	intersecta com as bordas do canvas
+	"""
+
+	if x0 == x1: 
+		return float (canvas.r2cx(x0)), 0, float (canvas.r2cx(x1)), float (canvas['height'])
+	if y0 == y1:
+		return 0, float (canvas.r2cy(y0)), float (canvas['width']), float (canvas.r2cy(y1))
+
+	x0 = float (canvas.r2cx(x0))
+	y0 = float (canvas.r2cy(y0))
+	x1 = float (canvas.r2cx(x1))
+	y1 = float (canvas.r2cy(y1))
+
+	dy, dx = (y1 - y0), (x1 - x0)
+
+	"pontos candidatos a estarem na resposta"
+	x = [0] * 4
+	y = [0] * 4
+
+	"intersecao com as quatro retas da borda do canvas:"
+
+	"intersecao com reta vertical: (0, 0) e (0, canvas['height'])"
+	x[0] = 0.
+	alpha = (x[0] - x0) / dx
+	y[0] = alpha * dy + y0
+
+	"intersecao com reta horizontal: (0, canvas['height']) e (canvas['width'], canvas['height'])"
+	y[1] = float (canvas['height'])
+	alpha = (y[1] - y0) / dy
+	x[1] = alpha * dx + x0
+
+	"intersecao com reta vertical: (canvas['width'], canvas['height']) e (canvas['width'], 0)"
+	x[2] = float (canvas['width']) 
+	alpha = (x[2] - x0) / dx
+	y[2] = alpha * dy + y0
+
+	"intersecao com reta horizontal: (canvas['width'], 0) e (0, 0)"
+	y[3] = 0.
+	alpha = (y[3] - y0) / dy
+	x[3] = alpha * dx + x0	
+
+	"pontos na resposta"
+	ret_x = []
+	ret_y = []
+
+	"Encontra os dois pontos que estão na borda do canvas"
+
+	"borda vertical esquerda"
+	if y[0] >= 0 and y[0] <= float (canvas['height']):
+		ret_x.append(x[0])
+		ret_y.append(y[0])
+
+	"borda horizontal superior"
+	if x[1] >= 0 and x[1] <= float (canvas['width']):
+		ret_x.append(x[1])
+		ret_y.append(y[1])
+
+	"borda vertical direita"
+	if y[2] >= 0 and y[2] <= float (canvas['height']):
+		ret_x.append(x[2])
+		ret_y.append(y[2])
+
+	"borda horizontal inferior"
+	if x[3] >= 0 and x[3] <= float (canvas['width']):
+		ret_x.append(x[3])
+		ret_y.append(y[3])
+
+	return ret_x[0], ret_y[0], ret_x[1], ret_y[1]
+
+def plot_line (x0, y0, x1, y1, color, linewidth):
+	x2, y2, x3, y3 = find_intersection_points(x0, y0, x1, y1) 
+	lineto_id = canvas.create_line (int (x2), int (y2), int (x3), int (y3), 
+					   fill=color, width=linewidth)
+	return lineto_id
+
+def inner_product(x0, y0, x1, y1):
+	return x0 * x1 + y0 * y1
+
+def plot_ray (x0, y0, x1, y1, color, linewidth):
+	"trocando para coordenadas do canvas"
+	x2, y2, x3, y3 = find_intersection_points(x0, y0, x1, y1)
+
+	x0 = float (canvas.r2cx(x0))
+	y0 = float (canvas.r2cy(y0))
+	x1 = float (canvas.r2cx(x1))
+	y1 = float (canvas.r2cy(y1))
+	
+	"""decide qual ponto (que será guardado em (x2, y2)) formará com (x0, y0)
+	o segmento que representará a semi-reta"""
+	if inner_product((x2 - x0), (y2 - y0), (x1 - x0), (y1 - y0)) < 0: 
+		x2, y2 = x3, y3
+
+	lineto_id = canvas.create_line (int (x0), int (y0), 
+					   int (x2), int (y2), 
+					   fill=color, width=linewidth)	
+	return lineto_id						 
 
 def plot_vert_line (x, color, linewidth):
 	lineto_id = canvas.create_line (canvas.r2cx(x), 0, 

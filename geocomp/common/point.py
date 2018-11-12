@@ -55,15 +55,11 @@ class Point:
 
     def distance_to(self, other):
         return dist2(self, other) ** 0.5
-    # def __sub__(self, other):
-    #     if not isinstance(other, Point):
-    #         raise ValueError('Cannot subtract point and ' + str(type(other)))
-    #     return Point(self.x - other.x, self.y - other.y)
 
-    def lineto (self, p, color=config.COLOR_LINE):
-        "Desenha uma linha ate um ponto p na cor especificada"
-        self.lineto_id[p] = control.plot_line (self.x, self.y, p.x, p.y, color)
-        return self.lineto_id[p]
+	def lineto (self, p, color=config.COLOR_LINE):
+		"Desenha uma linha ate um ponto p na cor especificada"
+		self.lineto_id[p] = control.plot_segment (self.x, self.y, p.x, p.y, color)
+		return self.lineto_id[p]
 
     def remove_lineto (self, p, id = None):
         "Apaga a linha ate o ponto p"

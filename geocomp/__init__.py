@@ -21,8 +21,12 @@ from .common.prim import get_count
 from .common.prim import reset_count
 
 children = (   ( 'convexhull', None, 'Fecho Convexo' ),
+<<<<<<< HEAD
 		( 'farthest',  None, 'Par Mais Distante' ),
 		( 'point_visibility', None, 'Visibilidade a\npartir de um ponto' )
+=======
+		( 'farthest',  None, 'Par Mais Distante' )
+>>>>>>> c8d326f829ee099fbacbfd73639aa6c8c32c1634
 	)
 
 __all__ = [p[0] for p in children]
