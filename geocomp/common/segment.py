@@ -62,7 +62,7 @@ class Segment:
 
         return (left(self.init, self.to, other_segment.init)
                 ^ left(self.init, self.to, other_segment.to))            \
-               or (left(other_segment.init, other_segment.to, self.init)
+               and (left(other_segment.init, other_segment.to, self.init)
                    ^ left(other_segment.init, other_segment.to, self.to))
 
 

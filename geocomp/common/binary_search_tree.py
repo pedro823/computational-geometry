@@ -60,6 +60,8 @@ class BinarySearchTree:
         return s
 
     def __str__(self, indent="  "):
+        if not self.root:
+            return "(root.size = 0)\n(Empty tree)"
         return ("(root.size = %d)\n" % self.size) + \
                 self.__str__helper(self.root, indent=indent)
 
