@@ -15,6 +15,10 @@ class Point:
         self.z = z
         self.lineto_id = {}
 
+    def approx_equals(self, other):
+        return abs(self.x - other.x) < 1e-7 \
+               and abs(self.y - other.y) < 1e-7
+
     def __repr__ (self):
         "Retorna uma string da forma '( x y )'"
         return '( ' + repr(self.x) + ' ' + repr(self.y) + ' )'
