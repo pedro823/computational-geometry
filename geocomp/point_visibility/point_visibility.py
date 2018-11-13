@@ -123,9 +123,12 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     # STEP 2: Initialize sweep line
     sweep_line = SweepLine(origin_point)
 
+    sweep_line.ray.plot('pink')
+
     # STEP 2.1: Check if there are no points inside the sweep line already. O(n)
     for i, segment in enumerate(segment_list):
-        segment.hilight()
+        segment.plot('blue')
+        control.sleep()
         if intersects_with_sweep_line(sweep_line, segment) \
            and not sweep_line.ray.has_inside(segment.init):
             add_to_sweep_line(sweep_line, i, segment)
@@ -136,7 +139,6 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
             segment.plot()
 
     print(sweep_line.bst)
-    sweep_line.ray.plot('pink')
 
     # STEP 3: Sweep line
     while event_heap:
@@ -145,30 +147,31 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
         sweep_line.ray.hide()
         sweep_line.ray.direction = Vector.from_angle(angle_from_origin(origin_point, event.point))
         sweep_line.ray.plot('pink')
-        print(sweep_line.ray.direction)
+        print(sweep_line.bst)
 
         minimum = sweep_line.bst.minimum()
         if minimum:
             visible_segments.add(minimum.key.segment)
+            minimum.key.segment.hide()
             minimum.key.segment.plot('yellow')
 
         # 3.2: Inserir ou remover da ABBB os itens
         # Não precisa checar intersecção
         # :)
         segment = segment_list[event.segment_id]
-        if event.type == EventType.INSERT:
 
-            sweep_line.bst.insert(event.segment_id, 
-                                  SegmentReference(segment, event.point))
+        if event.type == EventType.INSERT:
+            add_to_sweep_line(sweep_line, event.segment_id, segment)
+            # sweep_line.bst.insert(event.segment_id, 
+            #                       SegmentReference(segment, event.point))
         elif event.type == EventType.DELETE:
-            segment.hide()
-            segment.plot()
-            sweep_line.bst.delete(event.segment_id)
+            remove_from_sweep_line(sweep_line, event.segment_id, segment)
         control.sleep()
     
     minimum = sweep_line.bst.minimum()
     if minimum:
         visible_segments.add(minimum.key.segment)
+        minimum.key.segment.hide()
         minimum.key.segment.plot('yellow')
 
     control.sleep()
