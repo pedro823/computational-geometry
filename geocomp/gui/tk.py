@@ -42,15 +42,15 @@ def find_intersection_points(x0, y0, x1, y1):
 	intersecta com as bordas do canvas
 	"""
 
-	if x0 == x1: 
-		return float (canvas.r2cx(x0)), 0, float (canvas.r2cx(x1)), float (canvas['height'])
-	if y0 == y1:
-		return 0, float (canvas.r2cy(y0)), float (canvas['width']), float (canvas.r2cy(y1))
-
 	x0 = float (canvas.r2cx(x0))
 	y0 = float (canvas.r2cy(y0))
 	x1 = float (canvas.r2cx(x1))
 	y1 = float (canvas.r2cy(y1))
+
+	if x0 == x1: 
+		return x0, 0, x1, float (canvas['height'])
+	if y0 == y1:
+		return 0, y0, float (canvas['width']), y1
 
 	dy, dx = (y1 - y0), (x1 - x0)
 
