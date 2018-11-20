@@ -68,11 +68,13 @@ def intersects_with_sweep_line(sweep_line: SweepLine, seg: Segment) -> bool:
 
 @type_checked()
 def add_to_sweep_line(sweep_line: SweepLine, id: int, segment: Segment):
+    print(f"Adding {id}")
     ref = SegmentReference(segment, segment.init)
     sweep_line.bst.insert(id, ref)
 
 @type_checked()
 def remove_from_sweep_line(sweep_line: SweepLine, id: int):
+    print(f"Removing {id}")
     sweep_line.bst.delete(id)
 
 @type_checked()
