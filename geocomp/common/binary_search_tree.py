@@ -76,7 +76,8 @@ class BinarySearchTree:
         self.control[x.id] = x
         self.root = self.__insert(self.root, x)
         self.root.parent = NilNode.instance()
-        self.root.color = Node.BLACK
+        self.__insert_balance(x)
+        # self.root.color = Node.BLACK
         self.size += 1
         res, err = self.is_rbt()
         if not res:
@@ -94,14 +95,49 @@ class BinarySearchTree:
             act_node.right = self.__insert(act_node.right, new_node)
             act_node.right.parent = act_node
 
-        if act_node.right.is_red() and not act_node.left.is_red():
-            act_node = self.__rotate_left(act_node)
-        if act_node.left.is_red() and act_node.left.left.is_red():
-            act_node = self.__rotate_right(act_node)
-        if act_node.left.is_red() and act_node.right.is_red():
-            self.__flip_colors(act_node)
+        # if act_node.right.is_red() and not act_node.left.is_red():
+        #     act_node = self.__rotate_left(act_node)
+        # if act_node.left.is_red() and act_node.left.left.is_red():
+        #     act_node = self.__rotate_right(act_node)
+        # if act_node.left.is_red() and act_node.right.is_red():
+        #     self.__flip_colors(act_node)
 
         return act_node
+
+    def __insert_balance(self, node):
+        node.color = Node.RED
+        while node != self.root and node.parent.is_red():
+            if node.parent == node.parent.parent.left:
+                uncle = node.parent.parent.right
+                if uncle and uncle.is_red():
+                    # node.parent.color = Node.BLACK
+                    # uncle.color = Node.BLACK
+                    # node.parent.parent.color = Node.RED
+                    node = node.parent.parent
+                    self.__flip_colors(node)
+                else:
+                    if node == node.parent.right:
+                        node = node.parent
+                        self.__rotate_left(node)
+                    # node.parent.color = Node.BLACK
+                    # node.parent.parent.color = Node.RED
+                    self.__rotate_right(node.parent.parent)
+            else:
+                uncle = node.parent.parent.left
+                if uncle and uncle.is_red():
+                    # node.parent.color = Node.BLACK
+                    # uncle.color = Node.BLACK
+                    # node.parent.parent.color = Node.RED
+                    node = node.parent.parent
+                    self.__flip_colors(node)
+                else:
+                    if node == node.parent.left:
+                        node = node.parent
+                        self.__rotate_right(node)
+                    # node.parent.color = Node.BLACK
+                    # node.parent.parent.color = Node.RED
+                    self.__rotate_left(node.parent.parent)
+        self.root.color = Node.BLACK
 
     def delete(self, id: int):
         if not (id in self.control):
