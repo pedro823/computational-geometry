@@ -1,3 +1,5 @@
+import math
+
 class Vector:
     """ Immutable vector structure. """
 
@@ -22,10 +24,14 @@ class Vector:
 
         norm = cls.__get_norm(args)
         inverted_norm = 1.0 / norm
-        v =  Vector(value * inverted_norm for value in args)
+        v = cls(value * inverted_norm for value in args)
         v._norm = norm
         v._cached_norm = True
         return v
+
+    @classmethod
+    def from_angle(cls, angle):
+        return cls((math.cos(angle), math.sin(angle)))
 
     @property
     def dimension(self):

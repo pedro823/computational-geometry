@@ -3,6 +3,7 @@ import math
 from itertools import islice
 from enum import Enum
 
+from geocomp.common import control
 from geocomp.common.segment import Segment
 from geocomp.common.vector import Vector
 from geocomp.common.ray import Ray
@@ -67,8 +68,14 @@ def intersects_with_sweep_line(sweep_line: SweepLine, seg: Segment) -> bool:
 
 @type_checked()
 def add_to_sweep_line(sweep_line: SweepLine, id: int, segment: Segment):
+    print(f"Adding {id}")
     ref = SegmentReference(segment, segment.init)
     sweep_line.bst.insert(id, ref)
+
+@type_checked()
+def remove_from_sweep_line(sweep_line: SweepLine, id: int):
+    print(f"Removing {id}")
+    sweep_line.bst.delete(id)
 
 @type_checked()
 def point_visibility(segment_list: list, origin_point: Point) -> list:
@@ -87,36 +94,53 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
             if e1.type != e2.type:
                 return -multiplier
 
-            return round(
-                        distance_to_origin(origin_point, e1.point) 
+            return round(distance_to_origin(origin_point, e1.point)
                         - distance_to_origin(origin_point, e2.point), 7) * multiplier
         return angle1 - angle2
+
+    @type_checked()
+    def counterclockwise(p1: Point, p2: Point) -> float:
+        angle1, angle2 = angle_from_origin(origin_point, p1), angle_from_origin(origin_point, p2)
+        if abs(angle1 - angle2) < 1e-7:
+            return -1.0
+        if (angle1 > angle2 and angle1 - angle2 <= math.pi) \
+            or (angle1 < angle2 and angle2 - angle1 > math.pi):
+            return 1.0
+        return -1.0
 
     # STEP 1: Sort event points
     event_points = []
     for idx, segment in enumerate(segment_list):
-        event_insert = Event(idx, segment.init, EventType.INSERT)
-        event_delete = Event(idx, segment.to, EventType.DELETE)
-
-        if comparison_function(event_insert, event_delete) > 0:
+        if counterclockwise(segment.init, segment.to) > 0:
             segment.to, segment.init = segment.init, segment.to
-            event_insert.point, event_delete.point = event_delete.point, event_insert.point
 
-        event_points.append(event_insert)
-        event_points.append(event_delete)
+        event_points.append(Event(idx, segment.init, EventType.INSERT))
+        event_points.append(Event(idx, segment.to, EventType.DELETE))
 
-    event_heap = Heap.from_list(event_points, 
+        segment.hilight()
+        control.sleep()
+        segment.plot()
+
+    event_heap = Heap.from_list(event_points,
                                 cmp_function=comparison_function)
 
     # STEP 2: Initialize sweep line
     sweep_line = SweepLine(origin_point)
 
+    sweep_line.ray.plot('pink')
+
     # STEP 2.1: Check if there are no points inside the sweep line already. O(n)
     for i, segment in enumerate(segment_list):
-        segment.hilight()
+        segment.plot('blue')
+        control.sleep()
         if intersects_with_sweep_line(sweep_line, segment) \
            and not sweep_line.ray.has_inside(segment.init):
             add_to_sweep_line(sweep_line, i, segment)
+            segment.hide()
+            segment.plot('green')
+        else:
+            segment.hide()
+            segment.plot()
 
     print(sweep_line.bst)
 
@@ -124,32 +148,44 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     while event_heap:
         event = event_heap.pop_element()
         # 3.1: pegar o minimo e colocar no set
-        print(event)
-        print(event.type)
+        sweep_line.ray.hide()
+        sweep_line.ray.direction = Vector.from_angle(angle_from_origin(origin_point, event.point))
+        sweep_line.ray.plot('white')
+        print(sweep_line.bst)
+
         minimum = sweep_line.bst.minimum()
         if minimum:
             visible_segments.add(minimum.key.segment)
+            minimum.key.segment.hide()
+            minimum.key.segment.plot('yellow')
 
         # 3.2: Inserir ou remover da ABBB os itens
         # Não precisa checar intersecção
         # :)
-        if event.type == EventType.INSERT:
+        segment = segment_list[event.segment_id]
 
-            segment = segment_list[event.segment_id]
-            sweep_line.bst.insert(event.segment_id, 
-                                  SegmentReference(segment, event.point))
+        if event.type == EventType.INSERT:
+            add_to_sweep_line(sweep_line, event.segment_id, segment)
+            if not (segment in visible_segments):
+                segment.hide()
+                segment.plot('blue')
         elif event.type == EventType.DELETE:
-            sweep_line.bst.delete(event.segment_id)
-    
+            remove_from_sweep_line(sweep_line, event.segment_id)
+            if not (segment in visible_segments):
+                segment.hide()
+                segment.plot()
+
+        control.sleep()
+
     minimum = sweep_line.bst.minimum()
     if minimum:
         visible_segments.add(minimum.key.segment)
+        minimum.key.segment.hide()
+        minimum.key.segment.plot('yellow')
 
-
+    control.sleep()
     print(visible_segments)
     print(len(visible_segments))
-    # for segment in visible_segments:
-    #     segment.unhilight()
 
     return list(visible_segments)
 
