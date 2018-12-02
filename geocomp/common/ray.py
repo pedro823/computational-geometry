@@ -24,7 +24,7 @@ class Ray:
         return end_point.approx_equals(other)
 
     def plot(self, color=config.COLOR_LINE):
-        other_point = self.origin + self.direction*100
+        other_point = self.origin + self.direction*600
         self.lid = control.plot_ray(self.origin.x, self.origin.y, other_point.x, other_point.y, color)
 
     def hide(self, id = None):
