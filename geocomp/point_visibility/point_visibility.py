@@ -147,7 +147,7 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     # STEP 3: Sweep line
     while event_heap:
         event = event_heap.pop_element()
-        # 3.1: pegar o minimo e colocar no set
+        # 3.1: Take the minimum and put it into the set
         sweep_line.ray.hide()
         sweep_line.ray.direction = Vector.from_angle(angle_from_origin(origin_point, event.point))
         sweep_line.ray.plot('white')
@@ -159,16 +159,14 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
             minimum.key.segment.hide()
             minimum.key.segment.plot('yellow')
 
-        # 3.2: Inserir ou remover da ABBB os itens
-        # Não precisa checar intersecção
-        # :)
+        # 3.2: Insert/remove items from the BBST
         segment = segment_list[event.segment_id]
 
         if event.type == EventType.INSERT:
             add_to_sweep_line(sweep_line, event.segment_id, segment)
             if not (segment in visible_segments):
                 segment.hide()
-                segment.plot('blue')
+                segment.plot('green')
         elif event.type == EventType.DELETE:
             remove_from_sweep_line(sweep_line, event.segment_id)
             if not (segment in visible_segments):
@@ -183,10 +181,8 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
         minimum.key.segment.hide()
         minimum.key.segment.plot('yellow')
 
-    control.sleep()
+    sweep_line.ray.hide()
     print(visible_segments)
-    print(len(visible_segments))
-
     return list(visible_segments)
 
 def point_visibility_with_points(point_list: list) -> list:
