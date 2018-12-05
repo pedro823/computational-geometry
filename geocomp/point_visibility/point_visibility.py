@@ -9,8 +9,8 @@ from geocomp.common.vector import Vector
 from geocomp.common.ray import Ray
 from geocomp.common.point import Point
 from geocomp.common.prim import dist2
-from geocomp.common.binary_search_tree import BinarySearchTree
-from geocomp.common.heap import Heap
+from .binary_search_tree import BinarySearchTree
+from .heap import Heap
 from utils.type_checker import type_checked
 
 class SegmentReference:
@@ -68,18 +68,16 @@ def intersects_with_sweep_line(sweep_line: SweepLine, seg: Segment) -> bool:
 
 @type_checked()
 def add_to_sweep_line(sweep_line: SweepLine, id: int, segment: Segment):
-    print(f"Adding {id}")
     ref = SegmentReference(segment, segment.init)
     sweep_line.bst.insert(id, ref)
 
 @type_checked()
 def remove_from_sweep_line(sweep_line: SweepLine, id: int):
-    print(f"Removing {id}")
     sweep_line.bst.delete(id)
 
 @type_checked()
 def point_visibility(segment_list: list, origin_point: Point) -> list:
-    origin_point.hilight('yellow')
+    origin_point.hilight('white')
 
     visible_segments = set()
 
@@ -127,7 +125,7 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     # STEP 2: Initialize sweep line
     sweep_line = SweepLine(origin_point)
 
-    sweep_line.ray.plot('pink')
+    sweep_line.ray.plot('white')
 
     # STEP 2.1: Check if there are no points inside the sweep line already. O(n)
     for i, segment in enumerate(segment_list):
@@ -142,8 +140,6 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
             segment.hide()
             segment.plot()
 
-    print(sweep_line.bst)
-
     # STEP 3: Sweep line
     while event_heap:
         event = event_heap.pop_element()
@@ -151,7 +147,6 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
         sweep_line.ray.hide()
         sweep_line.ray.direction = Vector.from_angle(angle_from_origin(origin_point, event.point))
         sweep_line.ray.plot('white')
-        print(sweep_line.bst)
 
         minimum = sweep_line.bst.minimum()
         if minimum:
