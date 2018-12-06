@@ -76,7 +76,8 @@ def remove_from_sweep_line(sweep_line: SweepLine, id: int):
     sweep_line.bst.delete(id)
 
 @type_checked()
-def point_visibility(segment_list: list, origin_point: Point) -> list:
+def point_visibility(data: list) -> list:
+    origin_point, segment_list = data[0], data[1:]
     origin_point.hilight('white')
 
     visible_segments = set()
@@ -179,21 +180,3 @@ def point_visibility(segment_list: list, origin_point: Point) -> list:
     sweep_line.ray.hide()
     print(visible_segments)
     return list(visible_segments)
-
-def point_visibility_with_points(point_list: list) -> list:
-    ''' Before passing to the original point_visibility problem,
-        creates a problem using points drawn on the screen.
-    '''
-    if len(point_list) <= 2:
-        return []
-
-    if len(point_list) % 2 == 0:
-        # Even number of points => odd number on edges.
-        # adds last point again
-        point_list.append(point_list[-1])
-
-    origin_point = point_list[0]
-    segment_list = [Segment(x1, x2) for x1, x2
-                    in zip(islice(point_list, 1, None, 2), islice(point_list, 2, None, 2))]
-
-    return point_visibility(segment_list, origin_point)
