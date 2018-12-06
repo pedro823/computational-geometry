@@ -111,6 +111,15 @@ def plot_horiz_line (y, color=config.COLOR_LINE_SPECIAL,
 	update ()
 	return plot_id
 
+def plot_parabola(y,px,py,startx,endx,steps=50,color=config.COLOR_ALT2,linewidth=config.LINEWIDTH_SPECIAL):
+	# Desenha uma parabola usando a reta horizontal y e o ponto (px,py), 
+	# desenhada entre as x-coordenadas startx e endx, gerada usando número de passos steps,
+	# de cor color
+	if skip: return 0
+	plot_id = gui.plot_parabola(y,px,py,startx,endx,steps,color,linewidth)
+	update ()
+	return plot_id
+
 def plot_delete (id):
 	"""apaga da tela o elemento com identificador id"""
 	if skip: return 0

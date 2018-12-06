@@ -1,87 +1,103 @@
 #!/usr/bin/env python
 """Modulo para leitura de um arquivo de dados"""
 
-if __name__ != '__main__':
-    from .point import Point
-    from .segment import Segment
-else:
-    from point import Point
-    from segment import Segment
+from geocomp.common.point   import Point
+from geocomp.common.polygon import Polygon
+from geocomp.common.segment import Segment
 
-def open_file (name):
-    """Le o arquivo passado, e retorna o seu conteudo
 
-    Atualmente, ele espera que o arquivo contenha uma lista de pontos,
-    um ponto por linha, as duas coordenadas em cada linha. Exemplo:
+def read(filename):
+    """Reads any type of geometric primitive data structures (Point,
+    Polygon, Segment) from a file and returns it as a list.
 
-    0 0
-    0 1
-    10 100
+    This method reads geometric data from a file. Any empty line or
+    any line started by '#' (considered  a commentary) is ignored.
+    The input can be mixed, it can contains a set of Polygons, Points
+    and Segments and not necessarily only one type of data.
 
+    The following patterns are required during the input operation:
+
+    Point: defined by two floating point coordinates, on a line,
+           separated by whitespaces. For example:
+
+               0 0
+               0.5 1.5
+               1.5 3
+
+    Polygon: defined by a list of adjacent points, enclosed by '['
+             at the beginning and ']' at the end, in the order that
+             they appear in the polygon boundary, i.e., any pair of
+             consecutive points defines an edge on the polygon
+             boundary. For example, the following input defines a
+             square:
+
+             [
+             0 0
+             1 0
+             1 1
+             0 1
+             ]
+
+    Segment: defined by four floating point coordinates, on a line,
+             separated by whitespaces. Each pair of consecutive
+             coordinates defines a segment endpoint. For example,
+             the following input defines a segment from (0, 0) to
+             (0.5, 1.5):
+
+             0 0 0.5 1.5
+
+    :param filename: (str) The name of the file that will be read
+
+    :return: (list) A list of geometric primitive data structures
+             read from the file
+
+    Raises:
+        FileNotFoundError: if file could not be found
+
+        TypeError: if 'filename' is None
+
+        ValueError: if some input from the file does not follow the
+                    required patterns
     """
-    f = open (name, 'r')
-    #t = range (5000)
-    lista = []
-    cont = 0
-
-    for linha in f.readlines ():
-        if linha[0] == '#': continue
-
-        coord = linha.split()
-
-        fields = len (coord)
-        if fields == 0:
-            continue
-        if fields != 2:
-            raise Exception('cada linha deve conter 2 coordenadas')
-
-        x = float (coord[0])
-        y = float (coord[1])
-        lista.append (Point (x, y))
-
-    f.close()
-
-    return lista
-
-
-def parse_point_visibility_file(filename: str) -> tuple:
-    ''' Opens and parse a point visibility problem file.
-
-        File must be in format:
-        <ORIGIN POINT>
-        <SEGMENT>
-        <SEGMENT>
-        ...
-        <SEGMENT>
-        where
-        ORIGIN POINT = float float
-        SEGMENT = float_x1 float_y1 float_x2 float_y2
-
-        returns a tuple containing:
-        (origin: Point, segments: list[Segment])
-    '''
-    with open(filename, 'r') as file:
-        point_line = file.readline()
-        try:
-            origin_point = Point(*[float(coordinate) for coordinate in point_line.split()])
-        except Exception as ex:
-            raise Exception(f'Parse error at line 1: {ex}')
-        segment_list = []
-        for line_number, segment_line in enumerate(file):
-            try:
-                x1, y1, x2, y2 = segment_line.split()
-                segment_list.append(
-                    Segment(Point(x1, y1), Point(x2, y2))
+    with open(filename) as file:
+        i = 0
+        vertices = []
+        data = []
+        expecting_polygon = False
+        for line in file:
+            i += 1
+            line = line.split()
+            if len(line) == 0 or line[0] == "#":
+                continue
+            if line[0] == "[":
+                expecting_polygon = True
+            elif line[0] == "]":
+                expecting_polygon = False
+                data.append(Polygon(vertices))
+                vertices = []
+            elif len(line) == 4:
+                data.append(
+                    Segment(
+                        Point(float(line[0]), float(line[1])),
+                        Point(float(line[2]), float(line[3]))
+                    )
                 )
-            except Exception as ex:
-                raise Exception(f'Parse error at line {line_number + 2}: {ex}')
-        return origin_point, segment_list
+            elif len(line) == 2:
+                if expecting_polygon:
+                    vertices.append(Point(float(line[0]), float(line[1])))
+                else:
+                    data.append(Point(float(line[0]), float(line[1])))
+            else:
+                raise ValueError(
+                    "Invalid input from file: {}: line: {}: {}".format(filename, i, line))
+        return data
 
-
-if __name__ == '__main__':
-    import sys
-
-    for filename in sys.argv[1:]:
-        print(f'filename={filename}')
-        origin_point, segment_list = parse_point_visibility_file(filename)
-        print(f'origin_point={origin_point}\nsegment_list={segment_list}')
+# if __name__ == '__main__':
+#     import sys
+#
+#     for i in sys.argv[1:]:
+#         print((i,':'))
+#         lista = read_points (i)
+#         print(('  ',repr(len(lista)), 'pontos:'))
+#         for p in lista:
+#             print(p)
