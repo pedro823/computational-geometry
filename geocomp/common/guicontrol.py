@@ -5,9 +5,13 @@
 skip = 0
 gui = None
 
-import time
 from . import prim
 from . import control
+
+from geocomp.common.point   import Point
+from geocomp.common.polygon import Polygon
+from geocomp.common.segment import Segment
+
 
 def init_display (toolkit, master):
     "Inicializa o toolkit (Tk, GNOME,...) especificado"
@@ -37,18 +41,30 @@ def unhide_all ():
     skip = 0
     control.set_skip (0)
 
-def config_canvas (pontos):
+def plot_input(input):
     """Configura o canvas para mostrar os pontos passados."""
-
-    if len (pontos) == 0:
+    if len(input) == 0:
         return
 
-    minx = pontos[0].x
-    miny = pontos[0].y
-    maxx = pontos[0].x
-    maxy = pontos[0].y
+    points = []
+    for i in input:
+        if type(i) is Polygon:
+            points += i.vertices()
+        elif type(i) is Segment:
+            points += i.endpoints()
+        elif type(i) is Point:
+            points.append(i)
+        else:
+            raise ValueError(
+                "Invalid input of type: {}".format(type(i))
+            )
 
-    for i in pontos[1:]:
+    minx = points[0].x
+    miny = points[0].y
+    maxx = points[0].x
+    maxy = points[0].y
+
+    for i in points[1:]:
         if i.x < minx:
             minx = i.x
         if i.y < miny:
@@ -63,52 +79,51 @@ def config_canvas (pontos):
             minx = -1
             maxx = 1
         else:
-            minx = int (0.9 * minx)
-            maxx = int (1.1 * maxx)
+            minx = int(0.9 * minx)
+            maxx = int(1.1 * maxx)
 
     if miny == maxy:
         if miny == 0:
             miny = -1
             maxy = 1
         else:
-            miny = int (0.9 * minx)
-            maxx = int (1.1 * maxx)
+            miny = int(0.9 * minx)
+            maxx = int(1.1 * maxx)
 
+    control.freeze_update()
+    gui.config_canvas(minx, maxx, miny, maxy)
 
-    control.freeze_update ()
-    gui.config_canvas (minx, maxx, miny, maxy)
+    for i in input:
+        i.plot()
 
-    for p in pontos:
-        p.plot ()
     # para "garantir" que os updates nao estao congelados
-    control.thaw_update (10000000)
+    control.thaw_update(10000000)
+
 
 def run_algorithm(alg, input):
     """roda o algoritmo alg, usando input como entrada
 
     Retorna uma lista contendo o total de operacoes primitivas executadas
     e uma string opcionalmente retornada pelo algoritmo"""
-    config_canvas (input)
+    if len(input) > 0:
+        plot_input(input)
 
     show = 1
-    if gui.hide_algorithm ():
+    if gui.hide_algorithm():
         show = 0
-        hide_all ()
+        hide_all()
 
     input_dup = input[:]
 
-    ret = alg(input_dup)
+    ret = alg (input_dup)
 
     if not show:
-        unhide_all ()
+        unhide_all()
         control.freeze_update ()
         if hasattr (ret, 'hilight'):
             ret.hilight ()
         elif hasattr (ret, 'plot'):
             ret.plot ()
-        elif isinstance(ret, list):
-            for item in ret:
-                item.hilight()
         control.thaw_update ()
 
     extra_info = None
@@ -118,4 +133,4 @@ def run_algorithm(alg, input):
     cont = prim.get_count ()
     prim.reset_count ()
 
-    return (cont, extra_info)
+    return cont, extra_info

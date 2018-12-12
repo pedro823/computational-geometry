@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+DEBUG = True
+
 # tamanho da area de desenho
 # WIDTH = 500
 WIDTH = 600
@@ -27,7 +29,7 @@ LINEWIDTH_SPECIAL = 1
 # raio desse circulo para um ponto normal e em destaque
 #RADIUS = 2
 RADIUS = 3
-RADIUS_HILIGHT = 5
+RADIUS_HILIGHT = 4
 
 # cores usadas
 
